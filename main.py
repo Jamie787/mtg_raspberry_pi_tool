@@ -3,6 +3,13 @@ from i2c_lcd1602 import Screen
 from gpiozero import Button, RotaryEncoder
 from signal import pause
 
+'''
+To run the program, the necessary dependancies are gpiozero, RPi.GPIO, stopwatch.py
+RPi.GPIO is preinstalled
+sudo pip install stopwatch.py
+sudo pip3 install gpiozero
+'''
+
 setup = False
 screen = Screen(bus=1, addr=0x3f, cols=16, rows=2)
 button = Button(4, bounce_time=1)
@@ -103,6 +110,8 @@ def main():
     game = True
     player_turn = 0
     current_phase = 0
+    life_editor = False
+    player_life_editor = 0
 
     while game == True:
 
@@ -122,18 +131,20 @@ def main():
             if rot_but.is_pressed:
                 current_phase = 0
                 player_turn = player_turn + 1
+                turns = turns + 1
                 sleep(0.5)
 
             if current_phase == len(turn_phases):
                 current_phase = 0
                 player_turn = player_turn + 1
+                turns = turns + 1
 
             if right == True:
                 current_phase = current_phase + 1
                 right = False
 
             if left == True:
-                print("theres no undo button in magic :)")
+                print("there's no undo button in magic :))")
                 left = False
 
             screen.cursorTo(0, 1)
@@ -141,10 +152,37 @@ def main():
                 f"{list(player_life.keys())[player_turn % len(player_life)]}'s turn")
             screen.cursorTo(1, 1)
             screen.display_data(turn_phases[current_phase % len(turn_phases)])
+
         elif menu == 1:
-            pass
+            if rot_but.is_pressed:
+                life_editor = True
+            
+            if life_editor == False:
+                if right == True:
+                    if player_life_editor < (len(player_life) - 1):
+                        player_life_editor = player_life_editor + 1
+                        right = False
+
+                if left == True:
+                    if player_life_editor > 0:
+                        player_life_editor = player_life_editor - 1
+                        left = False
+                screen.cursorTo(0, 1)
+                screen.display_data("Edit Player Life")
+                screen.cursorTo(1, 1)
+                screen.display_data(f"{list(player_life.keys())[player_life_editor]}")
+            else:
+                screen.cursorTo(0, 1)
+                screen.display_data(f"{list(player_life.keys())[player_life_editor]}'s Life")
+                screen.cursorTo(1, 1)
+                screen.display_data(str(player_life[player_life_editor]))
+
         elif menu == 2:
-            pass
+            screen.cursorTo(0, 1)
+            screen.display_data("Game Statistics")
+            screen.cursorTo(1, 1)
+            screen.display_data(f"Turn {turns} Time {}")
+
         else:
             menu = 0
 
