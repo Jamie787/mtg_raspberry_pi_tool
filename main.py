@@ -1,7 +1,6 @@
 from time import sleep
 from i2c_lcd1602 import Screen
 from gpiozero import Button, RotaryEncoder
-from signal import pause
 from stopwatch import Stopwatch
 from datetime import timedelta
 from math import floor
