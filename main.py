@@ -34,6 +34,22 @@ def dict_key_name(dict_name: str, key_of_dict: int):
     return key_name
 
 
+def longest_time(turn_time: float):
+    global longest_turn_time
+
+    if turn_time > longest_turn_time:
+        longest_turn_time = turn_time
+
+
+def avg_turn_length():
+    sum_of_turns = 0
+    for turn in avg_turn_time:
+        sum_of_turns = sum_of_turns + turn
+
+    avg_time = sum_of_turns / len(avg_turn_time)
+    return avg_time
+
+
 def turn_left():
     global left
     left = True
@@ -115,6 +131,9 @@ def main():
     global turns
     global left
     global right
+    global ending
+    global longest_turn_time
+    global avg_turn_time
 
     menu = 0
     turns = 1
@@ -127,6 +146,8 @@ def main():
     stats_menu = 0
     action_menu = 0
     actions = ["Forfeit?", "Restart?"]
+    longest_turn_time = 0
+    avg_turn_time = []
 
     game_timer.start()
     turn_timer.start()
@@ -150,6 +171,8 @@ def main():
 
             if rot_but.is_pressed:
                 turn_timer.stop()
+                longest_time(turn_timer.time_elapsed)
+                avg_turn_time.append(turn_timer.time_elapsed)
                 turn_timer.reset()
                 current_phase = 0
                 player_turn = player_turn + 1
@@ -159,6 +182,8 @@ def main():
 
             if current_phase == len(turn_phases):
                 turn_timer.stop()
+                longest_time(turn_timer.time_elapsed)
+                avg_turn_time.append(turn_timer.time_elapsed)
                 turn_timer.reset()
                 current_phase = 0
                 player_turn = player_turn + 1
@@ -280,7 +305,7 @@ def main():
         for players_left, life in player_life_copy.items():
             if life == 0:
                 screen.cursorTo(0, 1)
-                screen.display_data(f"  {players_left}  ")
+                screen.display_data(f"    {players_left}  ")
                 screen.cursorTo(1, 1)
                 screen.display_data("   Eliminated   ")
                 player_life.pop(players_left)
@@ -296,8 +321,58 @@ def end():
     '''
     Displays text on screen for games results
     '''
+    global right
+    global left
+
+    right = False
+    left = False
 
     print("Thank you so much a-for-to playing my game")
+    screen.cursorTo(0, 1)
+    screen.display_data("    GAME OVER   ")
+    screen.cursorTo(1, 1)
+    screen.display_data(f"Ending: {ending}")
+    sleep(3)
+    screen.cursorTo(1, 1)
+    screen.display_data(f"Turns: {turns}")
+    sleep(5)
+    screen.cursorTo(1, 1)
+    screen.display_data(
+        f"Time:    {timedelta(seconds=floor(game_timer.time_elapsed))}")
+    sleep(5)
+    screen.cursorTo(1, 1)
+    screen.display_data(
+        f"TurnLth: {timedelta(seconds=floor(longest_turn_time))}")
+    sleep(5)
+    screen.cursorTo(1, 1)
+    screen.display_data(
+        f"TurnAvg: {timedelta(seconds=floor(avg_turn_length()))}")
+    sleep(5)
+
+    option_list = ["  View Results  ", "    New Game    "]
+    options = 0
+    while True:
+        rotary.when_rotated_clockwise = turn_right
+        rotary.when_rotated_counter_clockwise = turn_left
+
+        if (right == True) and (options == 0):
+            options = options + 1
+            right = False
+        else:
+            right = False
+        if (left == True) and (options == 1):
+            options = options - 1
+            left = False
+        else:
+            left = False
+        screen.cursorTo(0, 1)
+        screen.display_data("  Choose Option ")
+        screen.cursorTo(1, 1)
+        screen.display_data(option_list[options])
+        if (options == 0) and (rot_but.is_pressed == True):
+            end()
+        elif (options == 1) and (rot_but.is_pressed == True):
+            restart()
 
 
 def destroy():  # clears screen when interupted
