@@ -4,6 +4,7 @@ from gpiozero import Button, RotaryEncoder
 from stopwatch import Stopwatch
 from datetime import timedelta
 from math import floor
+from random import randint
 
 '''
 To run the program, the necessary dependancies are gpiozero, RPi.GPIO, ez-stopwatch
@@ -71,6 +72,7 @@ def start():
 
     screen.enable_backlight()
     screen.cursorTo(0, 1)
+    setup = False
 
     menu = 0
 
@@ -97,10 +99,21 @@ def start():
 
             if rot_but.is_pressed == True:
                 menu = menu + 1
-                sleep(0.1)
+                sleep(0.5)
 
         else:
-            return
+            setup = True
+    order = randint(0, 1)
+    if order == 1:
+        screen.cursorTo(0, 1)
+        screen.display_data("     Order      ")
+        screen.cursorTo(1, 1)
+        screen.display_data(" Player 1 ----> ")
+    elif order == 0:
+        screen.cursorTo(0, 1)
+        screen.display_data("     Order      ")
+        screen.cursorTo(1, 1)
+        screen.display_data(" <---- Player 1 ")
 
 
 def initialise_players():
@@ -124,8 +137,6 @@ def main():
     Menu 2 Displays statistics and allows ending game early or restarting
     '''
 
-    sleep(1)
-
     global player_life
     global turns
     global left
@@ -147,6 +158,8 @@ def main():
     actions = ["Forfeit?", "Restart?"]
     longest_turn_time = 0
     avg_turn_time = []
+
+    sleep(5)
 
     game_timer.start()
     turn_timer.start()
