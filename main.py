@@ -28,7 +28,7 @@ left = False
 right = False
 
 
-def dict_key_name(dict_name: str, key_of_dict: int):
+def dict_key_name(dict_name, key_of_dict):
 
     key_name = list(dict_name.keys())[key_of_dict]
     return key_name
@@ -402,7 +402,7 @@ def restart():
 
     import sys
     import os
-    os.execv(sys.executable, ['python'] + sys.argv)
+    os.execv(sys.executable, ['python3'] + sys.argv)
 
 
 if __name__ == '__main__':
